@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg4"
+   version="1.1"
+   class="svg-inline--fa fa-arrow-right fa-w-14 fa-7x"
+   viewBox="0 0 448 512"
+   role="img"
+   data-icon="arrow-right"
+   data-prefix="fal"
+   focusable="false"
+   aria-hidden="true">
+  <metadata
+     id="metadata10">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs8" />
+  <path
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:22.8920269;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="path2"
+     class=""
+     d="m 22.290028.1.384956 c 0. -3.866592..274819 -6.518016..517094 -3.700723..76077 181.664418.88.30807 185.983958.92.62853 -23.95176.4.31037 -154.072256.58.51393 -185.983958.83.42624 -4.319533..31953 -4.319533.1.32333 0.5.64379 l 6.518016..5171 c 4.319534..31952 11.323335..31952 15.642869. L 232.47876.71.57277 c 4.31952.4.31953 4.31952.11.32335 0.15.6438 L 37.932897.1.384956 c -4.319534.4.320455 -11.323335.4.320455 -15.642869. z" />
+  <path
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:22.8920269;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="path2-3"
+     class=""
+     d="m 423.76417.8.383471 c 0. 3.8666..274817 6.51802..517095 3.70073..760769 -181.66442.88.308064 -185.98396.92.628524 23.95177.4.31037 154.07225.58.51393 185.98396.83.42623 4.31953..31955 4.31953.1.32334 0.5.6438 l -6.51802..5171 c -4.31954..31953 -11.32333..31953 -15.64286. L 213.57545.68.57128 c -4.31954.4.31954 -4.31954.11.32335 0.15.64379 L 408.12131.8.383471 c 4.31953.4.320454 11.32332.4.320454 15.64286. z" />
+</svg>

@@ -1,0 +1,14 @@
+<Ifmodule mod_rewrite.c>
+  #  RewriteEngine on
+  #  RewriteRule    ^$    /    [L]
+  #  RewriteRule    (.*) /index.php?_=$1    [L]
+
+  Options +FollowSymLinks
+  RewriteEngine On
+
+  # redirect all requests to non-existing resources to special handler
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.+)$ /index.php?_=$1 [L,NC]
+
+</Ifmodule>
