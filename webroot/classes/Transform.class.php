@@ -25,7 +25,7 @@ class Transform extends Activity
 			, "ldate" 		=> time()
 			, "confirmeds" 	=> []
 			, "deaths" 		=> []
-			, "inner_serie" 	 => []
+			, "inner_serie" => []
 		]);
 		// load the custom transform function for especific country
 		$parser = IO::root("etc/parser.d/$countryname.php");
@@ -41,7 +41,7 @@ class Transform extends Activity
 
 	public static function only(String $country)
 	{
-		if(in_array($country, Vector::extract(self::load_list(), function($data){ return $data; }))) self::parse($country);
+		if(in_array($country, Vector::extract(self::load_list(), function($data){ return $data; }))) return self::parse($country);
 		return Core::response(-1, "$country not found!");
 	}
 }

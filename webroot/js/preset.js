@@ -57,23 +57,8 @@ bootloader.loadComponents.add(_=>{
 bootloader.onFinishLoading.add(nil => tileClickEffectSelector(".-tile"))
 
 app.onPragmaChange.add(x => {
-	switch (x) {
-		case START: 		/*********/ 
-		;
-		break;
-		case FRACTAL: 		/*********/ 
-		;
-		break;
-		case RELATIONAL:	/*********/ 
-		;
-		break;
-		case COMPARATIVE: 	/*********/ 
-		;
-		break;
-		case DOT2NEWS: 		/*********/ 
-		;
-		break;
-	}
+	app.last = app.current;
+	app.current = x;
 });
 
 // __scroll = new Swipe(app.body);
