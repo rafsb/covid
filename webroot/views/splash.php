@@ -1,1 +1,0 @@
-<template><h1>SPLASH</h1></template>

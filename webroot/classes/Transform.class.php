@@ -17,16 +17,13 @@ class Transform extends Activity
 		// parsing content
 		$content = IO::read("var/$countryname/$filename");
 		if($extension == "json") $content = Convert::json($content);
-		else if($extension == ".csv") $content = Vector::extract(preg_split("/\s+/ui",$content), function($line){ return preg_split("/[,]/ui", $line); });
+		else if($extension == ".csv") $content = Vector::extract(preg_split("/\n+/ui",$content), function($line){ return preg_split("/[,]/ui", $line); });
 		
 		// default object
-		$country = Convert::atoo([
+		$country = [
 			"country" 		=> $countryname
 			, "ldate" 		=> time()
-			, "confirmeds" 	=> []
-			, "deaths" 		=> []
-			, "inner_serie" => []
-		]);
+		];
 		// load the custom transform function for especific country
 		$parser = IO::root("etc/parser.d/$countryname.php");
 		if(is_file($parser)) include $parser;
@@ -43,5 +40,9 @@ class Transform extends Activity
 	{
 		if(in_array($country, Vector::extract(self::load_list(), function($data){ return $data; }))) return self::parse($country);
 		return Core::response(-1, "$country not found!");
+	}
+
+	public function render(){
+		return self::all();
 	}
 }

@@ -20,4 +20,8 @@ class Retrieve extends Activity
 		});
 		
 	}
+
+	public function render(){
+		return self::data();
+	}
 }

@@ -73,6 +73,7 @@ header('Content-Type: text/html; charset=UTF-8',true);?>
     <script type="text/javascript">
         (function(){ 
             app.hash = app.storage("HASH") || app.storage("HASH", <?= LOGIN_REQUIRED ? (User::logged() ? "'" . Request::sess("UUID") ."'" : "") : "app.nuid(12)" ?>);
+            bootloader&&app.initPool.add(nil =>  bootloader.loadComponents.fire());
             app.initialize();
         })();
     </script>

@@ -11,11 +11,10 @@
 		</footer>
 		<script type="text/javascript">
 			bootloader.onReadyStateChange.add(perc => {
-				$("#splash")[0].anime({ filter:"invert("+(1-perc/100)+")" })
-				$("#splash .--progressbar")[0].anime({ width: perc+"%" })
-
+				$("#splash")[0].anime({ filter:"invert("+(1-perc)+")" }, ANIMATION_LENGTH*2)
+				$("#splash .--progressbar")[0].anime({ width: (perc*100)+"%" }, ANIMATION_LENGTH)
 			})
-			bootloader.onFinishLoading.add(nil => $("#splash")[0].anime({ filter:"invert(0)" }).then(el => el.desappear(ANIMATION_LENGTH, true)))
+			bootloader.onFinishLoading.add(nil => $("#splash")[0].anime({ filter:"invert(0)" }, ANIMATION_LENGTH*2).then(el => el.desappear(ANIMATION_LENGTH*2, true)))
 			bootloader.ready("splash")
 		</script>
 	</section>

@@ -11,6 +11,7 @@ app.hash = app.storage("hash") || null;
 app.theme = app.storage("theme") || DEFAULT_APP_THEME;
 
 app.body = $("body")[0];
+app.data.Brazil = {};
 app.initial_pragma = START;
 
 bootloader.loaders = { 
@@ -21,6 +22,8 @@ bootloader.loaders = {
 	, helpers   : 0
 	, theme 	: 0
 	, worldjson : 0
+	, statesarray:0
+	, menujs 	: 0
 };
 
 bootloader.loadComponents.add(_=>{
@@ -41,24 +44,53 @@ bootloader.loadComponents.add(_=>{
 			app.load("webroot/views/xhr/splash.php");
 			app.exec("webroot/js/helpers.js");
 
-			app.call("var/World/meta.json").then(world => {
-				app.data.world = world.data.json();				
-				if(app.data.world) bootloader.ready("worldjson");
+			app.call("var/Brazil/total.json").then(world => {				
+				app.data.Brazil.serie = world.data.json();
+				if(app.data.Brazil) bootloader.ready("worldjson");
 				else app.error("Error loading World's timeseries...");
-			})
+			});
+
+			app.call("content/states/Brazil").then(states => {
+				states = states.data.json();				
+				if(states.length){
+					app.data.Brazil.innerserie = {};
+					var
+					loaders = {};
+					states.each(st => loaders[st] = 0);
+					bind(bootloader.loaders, loaders);
+					states.each(st => {
+						app.call("var/Brazil/"+st+"/meta.json").then(data => {
+							app.data.Brazil.innerserie[st] = data.data.json()
+							bootloader.ready(st);
+						})
+					});
+					bootloader.ready("statesarray");
+				}
+				else app.error("Error loading states's timeseries...");
+			});
+
 		// LOGIN
 		}else location.herf = "/login";
-
 
 		bootloader.ready("theme")
 	})
 })
 
-bootloader.onFinishLoading.add(nil => tileClickEffectSelector(".-tile"))
-
 app.onPragmaChange.add(x => {
+
+	if(x === true) return;
+
 	app.last = app.current;
 	app.current = x;
+
+	let
+	container = $("#home")[0];
+
+	container.get(".--confirmed")[0].text(app.n2s(x.c.last()));
+	container.get(".--deaths")[0].text(app.n2s(x.d.last()));
+
+	console.log(x)
+
 });
 
 // __scroll = new Swipe(app.body);
@@ -67,7 +99,3 @@ app.onPragmaChange.add(x => {
 // __scroll.right(()=>{ });
 // __scroll.left(()=>{ });
 // __scroll.fire();
-
-app.initPool.add(_ => {
-	if(bootloader) bootloader.loadComponents.fire();
-})

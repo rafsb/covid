@@ -11,4 +11,26 @@ class Content extends Activity
 	public static function series(String $countryname){
 		return Convert::json(self::__load_country__($countryname));
 	}
+
+	public function totals(String $countryname){
+		$return = "";
+		$path = IO::root("var/$countryname");
+		if(is_dir($path)){
+			$country = new stdClass;
+			$states = IO::folders($path);
+			$country->{"TOTAL"} = IO::jout("$path/total.json");			
+			Vector::each($states, function($state) use ($path, &$country){ $country->{$state} = IO::jout("$path/$state/total.json"); });
+			$return = Convert::json($country);
+		}else $return = Core::response(-1, "no country folder found");
+		return $return;
+	}
+
+	public function states(String $countryname){
+		$return = "";
+		$path = IO::root("var/$countryname");
+		if(is_dir($path)) $return = Convert::json(IO::folders($path));
+		else $return = Core::response(-1, "no country folder found");
+		return $return;
+	}
+
 };
