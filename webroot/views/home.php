@@ -14,19 +14,16 @@ $bg = $files[random_int(0,sizeof($files)-1)];
  	background-attachment: fixed;
  	background-position: center center ;
  	padding:1.5em;
- 	opacity:0;
- 	display:none;">
+ 	opacity:0;">
  	<div class="-wrapper -left -no-scrolls" style="background:inherit;border-radius: .5em;box-shadow: 0 0 .5em #000000AA">
  		<blur></blur>
+
  		<!-- MENU -->
- 		<div class="-left -zero -bar -col-2 -content-center" style="background:#000000AA">
- 			<div class="-inverted" style="font-size: 1.5em;color:black;padding:1em 0 .5em;">
-				<img class="-left" style="height:1.5em" src="img/icons/faau-square.svg">
-				<div class="-left" style="padding:.125em 0;"><f style="font-weight:lighter;margin-right:.25em">FAAU | <b style="top:-2px">COVID-19</b></f></div>
-			</div>
+ 		<div id='menu' class="-left -zero -bar -col-2 -content-center" style="background:#000000AA">
+			<img class="-row -inverted" style="max-height:2.5em;padding:.5em;margin-top:1em" src="img/faau-covid.svg"/>
 			<div class="-row" style="padding:1em 1.5em 2em;">
 				<input type="text" name="seek_a_state" class="-col-10 -left -roboto" style="font-size:1em;padding:.45em 1em;border-radius:.25em 0 0 .25em;color:white;background:#ffffff22;border:none">
-				<div class="-left -col-2 -content-center -pointer" style="background:#ffffff44;;border-radius: 0 .25em .25em 0">
+				<div class="-left -col-2 -content-center -pointer --seekbutton" style="background:#ffffff44;;border-radius: 0 .25em .25em 0">
 					<img src="img/icons/search.svg" class="-inverted" style="padding:.5em;height:2em"/>
 				</div>
 			</div>
@@ -50,24 +47,85 @@ $bg = $files[random_int(0,sizeof($files)-1)];
  		</div>
 
  		<!-- CONTAINER -->
- 		<div class="-left -zero -bar -col-10" style="background:#ffffffDD">
+ 		<div id='container' class="-left -zero -bar -col-10" style="background:#ffffffDD">
 
- 			<nav class="-right -bar -col-3 -content-right" style="padding:1em">
+ 			<!-- RIGHT BAR -->
+ 			<nav class="-right -bar -col-2 -content-center" style="padding:1em">
  				<div class="-absolute -zero -bar" style="width:1px;background-image: linear-gradient(to bottom, transparent, #00000044, transparent)"></div>
- 				<div class="-row" style="color:#00000088; padding:1em .5em">CASOS ACUMULADOS</div>
- 				<div class="-row --confirmed" style="color:#000000DD;font-size: 2em"></div>
- 				<div class="-row" style="color:#00000088; padding:1em .5em">MORTES</div>
- 				<div class="-row --deaths" style="color:#000000DD;font-size: 2em"></div>
+ 				<span class="-row" style="font-size: 2em;padding:.5em;color:#00000088">TOTAIS</span>
+ 				<div class="-row" style="color:#00000088; padding:.5em">INFECTADOS</div>
+ 				<div class="-row --confirmed" data-num='1' style="color:#000000DD;font-size: 2em"></div>
+ 				<div class="-row" style="color:#00000088; padding:.5em;margin-top:1em">MORTES</div>
+ 				<div class="-row --deaths"  data-num='1' style="color:#000000DD;font-size: 2em"></div>
  			</nav>
 
- 			<div class="-right -bar -col-9 -content-left">
- 				
+ 			<!-- HOME -->
+ 			<div class="-absolute -zero -bar -col-10 --home -scrolls" style="color:#000000AA">
+ 				<!-- HEADER -->
+ 				<header class="-row" style="height:3em;padding:1.5em;">
+ 						<span class="-left -pointer" style="font-size: 2em" onclick="window.app.pragma = true">BRASIL</span>
+ 						<span class="-left --cityname" style="text-transform: uppercase;font-size: 2em;;font-weight:lighter"></span>
+ 				</header>
+
+ 				<!-- SIR -->
+				<div class="-row -content-left" style="padding:1.5em">
+					<span>S.I.R CUSTOMIZADO (PREDIÇÃO C/ I.A)</span>
+					<div class="-absolute -col-4 -zero-bottom" style="height:1px;background-image: linear-gradient(to right, #00000044, transparent)"></div>
+				</div>
+ 				<div class="-row">
+ 					<!-- ACUMULATED CASES -->
+ 					<div class="-row -left" style="padding: 2em 1em 2em;height:24em">
+ 						<span class="-right" style="padding:0 1em">SÉRIE TOTAL</span>
+ 						<div class="-wrapper --home-sir-graph" style="margin:1em 0"></div>
+ 					</div>
+ 				</div>
+
+ 				<!-- CONFIRMED -->
+ 				<div class="-left -col-6">
+					<div class="-row -content-left" style="padding:1.5em;margin-top:2em">
+						<span>CASOS CONFIRMADOS (ÚLTIMOS 60 DIAS)</span>
+						<div class="-absolute -col-4 -zero-bottom" style="height:1px;background-image: linear-gradient(to right, #00000044, transparent)"></div>
+					</div>
+	 				<div class="-row">
+	 					<!-- ACUMULATED CASES -->
+	 					<div class="-row -left" style="padding: 2em 1em 2em;height:16em">
+	 						<span class="-right" style="padding:0 1em">ACUMULADOS</span>
+	 						<div class="-wrapper --home-accumulated-infected-graph" style="margin:1em 0"></div>
+	 					</div>
+	 					<!-- DAILY CASES -->
+	 					<div class="-row -left" style="padding: 2em 2em 2em 1em;height:8em">
+	 						<span class="-right" style="padding:0 1em">DIÀRIOS</span>
+	 						<div class="-wrapper --home-daily-infected-graph" style="margin:1em 0"></div>
+	 					</div>
+	 				</div>
+	 			</div>
+
+ 				<!-- DEATHS-->
+ 				<div class="-left -col-6">
+	 				<div class="-row -content-left" style="padding:1.5em;margin-top:2em">
+						<span>MORTES (ÚLTIMOS 60 DIAS)</span>
+						<div class="-absolute -col-4 -zero-bottom" style="height:1px;background-image: linear-gradient(to right, #00000044, transparent)"></div>
+					</div>
+	 				<div class="-row">
+	 					<!-- ACUMULATED CASES -->
+	 					<div class="-row -left" style="padding: 2em 1em 2em;height:16em">
+	 						<span class="-right" style="padding:0 1em">ACUMULADOS</span>
+	 						<div class="-wrapper --home-accumulated-deaths-graph" style="margin:1em 0"></div>
+	 					</div>
+	 					<!-- DAILY CASES -->
+	 					<div class="-row -left" style="padding: 2em 2em 2em 1em;height:8em">
+	 						<span class="-right" style="padding:0 1em">DIÀRIOS</span>
+	 						<div class="-wrapper --home-daily-deaths-graph" style="margin:1em 0"></div>
+	 					</div>
+	 				</div>
+	 			</div>
+ 				<div class="-row" style="height:24em"></div>
  			</div>
- 			
  		</div>
  	</div>
  </div>
  <script>
- 	app.exec("webroot/js/menu.js").then(nil => bootloader.ready("menujs"));
- 	bootloader.onFinishLoading.add(nil => $("#home")[0].appear())
+
+ 	bootloader.onFinishLoading.add(_ => $("#home")[0].appear())
+
  </script>

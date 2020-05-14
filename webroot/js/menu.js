@@ -1,11 +1,15 @@
-
+window.ran = false;
 var
-ran = false
-;
-__load_menu_countries_series__ = function(iter=10){
+key_seek = new Throttle(e => {
+	if(e) {
+		$("#home #menu .--statelist ")[0].children.array().each(el => {
+			if(!(el.get("div")[1].text().toLowerCase().indexOf(e)+1)) el.desappear();
+			else el.appear();
+		})
+	} else $("#home #menu .--statelist ")[0].children.array().appear()
+}, 200)
+, __load_menu_countries_series__ = function(){
 	if(ran) return;
-	if(!iter) return app.error("Error! loading countries content series into main menu...");
-	if(!app.data.Brazil||!app.data.Brazil.innerserie||!app.data.Brazil.innerserie.keys().length) setTimeout(__load_menu_countries_series__, ANIMATION_LENGTH, --iter);
 	ran = true;	
 	
 	// #home .--statelist
@@ -17,25 +21,30 @@ __load_menu_countries_series__ = function(iter=10){
 
 		state.content.each(city => {
 
-			if(city.key.indexOf("CASO SEM")+1) return;
+			if(city.key.indexOf("LOCALIZ")+1) return;
 
-			// console.log(city.content.series.array());
-			
 			let
 			name = city.key
 			, st = state.key
 			, c = city.content.series.array().extract(function(){ return this.c })
 			, d = city.content.series.array().extract(function(){ return this.d })
+			, dc = city.content.series.array().extract(function(){ return this.dc })
+			, dd = city.content.series.array().extract(function(){ return this.dd })
 			, confirmed = c.calc(MAX)
 			, deaths = d.calc(MAX)
 			;
+
+			if(confirmed<100) return;
 
 			let
 			row = _("div", "-row -pointer --staterow", { 
 				padding:".25em .5em"
 				, borderRadius: ".25em"
-				, borderBottom:"1px solid @LIGHT2"
-				, display: confirmed < 100 ? "none" : "inline-block"
+				, borderBottom:"1px solid @WHITE"
+				, color: "@WHITE"
+				, background: "red"
+				, cursor: "pointer"
+				, fontSize:".75em"
 			}).data({
 				name: name
 				, state: st
@@ -43,31 +52,39 @@ __load_menu_countries_series__ = function(iter=10){
 				, deaths: deaths
 				, cserie: c.join(":")
 				, dserie: d.join(":")
+				, dcserie: dc.join(":")
+				, ddserie: dd.join(":")
 			}).app(
-				_("div", "-left -col-2 -content-center").text(st)
+				_("div", "-left -col-2 -content-center", { opacity:.8 }).text(st)
 			).app(
-				_("div", "-left -col-4 -ellipsis -content-left", { color:"@WHITE" }).text(name.split('/')[0])
+				_("div", "-left -col-4 -ellipsis -content-left").text(name.split('/')[0])
 			).app(
-				_("div", "-left -col-3 -content-right", { color: "@WHITEAA" }).text(app.n2s(deaths,1))
+				_("div", "-left -col-3 -content-right", { opacity:.6 }).text(app.n2s(deaths,1))
 			).app(
-				_("div", "-left -col-3 -content-right", { color: "@WHITE" }).text(app.n2s(confirmed,1))
+				_("div", "-left -col-3 -content-right", { opacity:.8 }).text(app.n2s(confirmed,1))
 			).on("mouseleave", function(){
-				if(this.dataset.selected!='1') this.style.background = "transparent"
+				this.css({ filter: "brightness(1)" })
 			}).on("mouseenter", function(){
-				if(this.dataset.selected!='1') this.css({ background: "@LIGHT1" })
-			}).on("click", function(){
-				$('#home .--staterow').not(this).data({ selected:0 }).css({ background:'transparent', color:"@WHITEAA" });
-				this.data({ selected: 1}).css({ background: "@LIGHT2", color:"@WHITE" })
+				this.css({ filter: "brightness(1.2)" })
+			}).on("mouseenter", function(){
+				// console.log($('#home .--staterow').not(this).css({ background:'transparent', color:"@WHITEAA" }));
 				app.pragma = {
 					name: this.dataset.name
+					, state: this.dataset.state
 					, c: this.dataset.cserie.split(':')
 					, d: this.dataset.dserie.split(':')
 					, nc: this.dataset.confirmed
 					, nd: this.dataset.deaths
+					, dc: this.dataset.dcserie.split(':')
+					, dd: this.dataset.ddserie.split(':')
 				}
+				$('#home .--staterow').not(this).css({ background:'transparent', color:"#FFF" });
+				this.css({ background: "#FFF", color:"#000" })
+
 			});
 
 			container.app(row)
+
 		})
 	})
 
@@ -78,8 +95,18 @@ __load_menu_countries_series__ = function(iter=10){
 		})
 	}).last().dispatchEvent(( new Event("click") ));
 
-	$('#home .--staterow').first().dispatchEvent(new Event("click"));
+	$("#home #menu input")[0].on("keyup", function(key){ 
+		if((key.which || key.keyCode) == 13) key_seek.fire(this.value.toLowerCase());
+	})
+	$("#home #menu .--seekbutton")[0].on("click", function(key){ 
+		let
+		inp = $("#home #menu input")[0]
+		;
+		key_seek.fire(inp.value.toLowerCase());
+		inp.value = ''
+	})
+
+	// $('#home .--staterow').first().dispatchEvent(new Event("click"));
 }
-	
-bootloader.onFinishLoading.add(nil => __load_menu_countries_series__(10));
+;
 bootloader.ready("helpers")

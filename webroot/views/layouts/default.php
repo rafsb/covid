@@ -72,8 +72,22 @@ header('Content-Type: text/html; charset=UTF-8',true);?>
     </body>
     <script type="text/javascript">
         (function(){ 
+            /* TOOLTIP */
+            document.getElementById("app").app(
+                _("tooltip", "-fixed -content-right --tooltip-element", {
+                    display: "none"
+                    , background: app.color_pallete["BACKGROUND"]
+                    , color:app.color_pallete["FONT"]
+                    , padding:".5em"
+                    , borderRadius:".25em"
+                    , border:"1px solid "+app.color_pallete["FONT"]
+                    , fontSize:".75em"
+                })
+            )
+            app.mousePool&&app.mousePool.add(coord => $("tooltip.--tooltip-element")[0].anime({ top:(coord.y+14)+"px", left: (coord.x+14)+"px" }))
+            /* INITIALIZATION */
             app.hash = app.storage("HASH") || app.storage("HASH", <?= LOGIN_REQUIRED ? (User::logged() ? "'" . Request::sess("UUID") ."'" : "") : "app.nuid(12)" ?>);
-            bootloader&&app.initPool.add(nil =>  bootloader.loadComponents.fire());
+            bootloader&&app.initPool.add(_ =>  bootloader.loadComponents.fire());
             app.initialize();
         })();
     </script>
