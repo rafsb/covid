@@ -172,12 +172,13 @@ app.onPragmaChange.add(x => {
 	let
 	csir_graph = new Graph({
 		target: $("#home .--home-sir-accumulated-graph").at().empty()
-		, series: [ sir_s[0], sir_s[4], sir_s[2] ]
+		, series: [ sir_s[0], sir_s[1] , sir_s[2] ]
 		, names: [ "não infectados", "infectados", "recuperados" ]
 		, labels: app.iter(80)
 		, lines: { css: { 
 			color: [ "#2C97DD88", "#D3531388", "#53D78B88" ] 
-			, strokeWidth: [ 4, 6, 4 ]
+			, "stroke-width": [ 2, 6, 2 ]
+			, "stroke-dasharray" : [ 2, null, 2 ]
 		} }
 		, type: "smooth"
 	})
@@ -186,7 +187,7 @@ app.onPragmaChange.add(x => {
 		, series: [ sir_s[6] ]
 		, names: [ "mortes" ]
 		, labels: app.iter(80)
-		, lines: { css: { color: death_color } }
+		, lines: { css: { color: "#f00D" } }
 		, type: "bars"
 	})
 	, dcsir_graph = new Graph({
@@ -194,7 +195,7 @@ app.onPragmaChange.add(x => {
 		, series: [ sir_s[5] ]
 		, names: [ "infectados" ]
 		, labels: app.iter(80)
-		, lines: { css: { color: infect_color } }
+		, lines: { css: { color: "#D35313" } }
 		, type: "bars"
 	})
 	;
