@@ -41,16 +41,16 @@ bootloader.loadComponents.add(_=>{
 		// USER IS LOGGED ?
 		if(app.hash){
 			
-			app.load("webroot/views/xhr/splash.php");
-			app.exec("webroot/js/helpers.js");
+			app.load("/webroot/views/xhr/splash.php");
+			app.exec("/webroot/js/helpers.js");
 
-			app.call("var/Brazil/total.json").then(world => {				
+			app.call("/var/Brazil/total.json").then(world => {				
 				app.data.Brazil.serie = world.data.json();
 				if(app.data.Brazil.serie) bootloader.ready("worldjson");
 				else app.error("Error loading World's timeseries...");
 			});
 
-			app.call("content/states/Brazil").then(states => {
+			app.call("/content/states/Brazil").then(states => {
 				states = states.data.json();				
 				if(states.length){
 					app.data.Brazil.innerserie = {};
@@ -60,12 +60,12 @@ bootloader.loadComponents.add(_=>{
 							app.data.Brazil.innerserie[st] = data.data.json()
 							bootloader.ready(st);
 						})
+						bootloader.ready("statesarray");
 					});
-					bootloader.ready("statesarray");
 				}
 				else app.error("Error loading states's timeseries...");
 
-				app.call("webroot/js/menu.js").then(_ => {
+				app.call("/webroot/js/menu.js").then(_ => {
 					bootloader.onFinishLoading.add(__load_menu_countries_series__);
 					bootloader.ready("menujs")
 				});

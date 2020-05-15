@@ -15,14 +15,15 @@ if(!User::logged() && Request::cook("USER") && Request::cook("ACTIVE")) Request:
 $args = Request::in("_");
 if($args)
 {   
+    if(substr($args,0,1)==DS) $args = substr($args,1);
     $args = explode('/',$args);
-    $class_name  = ucfirst($args[1]);
-    $method_name = isset($args[2]) && $args[2] ? $args[2] : "render";
+    $class_name  = ucfirst($args[0]);
+    $method_name = isset($args[1]) && $args[1] ? $args[1] : "render";
     
     try
     {
        $class_instance = new $class_name();
-        echo $class_instance->$method_name(...array_slice($args,3));
+        echo $class_instance->$method_name(...array_slice($args,2));
    }
     catch (Exception $e)
     {
