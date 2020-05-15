@@ -53,6 +53,7 @@ bootloader.loadComponents.add(_=>{
 			app.call("/content/states/Brazil").then(states => {
 				states = states.data.json();				
 				if(states.length){
+					states.each(s => bootloader.loaders[s] = false);
 					app.data.Brazil.innerserie = {};
 					states.each(st => {
 						bootloader.loaders[st] = 0;
