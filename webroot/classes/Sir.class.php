@@ -87,14 +87,20 @@ class __Cell__
 			//echo "$mult\n";
 		});
 
+		$i = 0;
+		while($line[$i]<10&&++$i<sizeof($line));
+		
+		$j = sizeof($line)-1;
+		while($line[$j]<10&&--$j>0);
+
 		return Convert::atoo([
-			"susceptible" => $s_a
-			, "infected"  => $i_a
-			, "recovered" => $r_a
-			, "deaths"    => $d_a
-			, "line"      => $line
-			, "daily_infected" => $daily_i
-			, "daily_deaths"   => $daily_d
+			"susceptible" => $i<$j ? array_slice($s_a, $i, $j) : []
+			, "infected"  => $i<$j ? array_slice($i_a, $i, $j) : []
+			, "recovered" => $i<$j ? array_slice($r_a, $i, $j) : []
+			, "deaths"    => $i<$j ? array_slice($d_a, $i, $j) : []
+			, "line"      => $i<$j ? array_slice($line, $i, $j) : []
+			, "daily_infected" => $i<$j ? array_slice($daily_i, $i, $j) : []
+			, "daily_deaths"   => $i<$j ? array_slice($daily_d, $i, $j) : []
 		]);
 	}
 

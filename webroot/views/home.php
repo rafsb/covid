@@ -60,66 +60,117 @@ $bg = $files[random_int(0,sizeof($files)-1)];
  			</nav>
 
  			<!-- HOME -->
- 			<div class="-absolute -zero -bar -col-10 --home -scrolls" style="color:#000000AA">
+ 			<div class="-absolute -zero -bar -col-10 --home -no-scrolls" style="color:#000000AA">
  				<!-- HEADER -->
- 				<header class="-row" style="height:3em;padding:1.5em;">
+ 				<header class="-row" style="height:4em;padding:1.5em;">
  						<span class="-left -pointer" style="font-size: 2em" onclick="window.app.pragma = true">BRASIL</span>
  						<span class="-left --cityname" style="text-transform: uppercase;font-size: 2em;;font-weight:lighter"></span>
  				</header>
 
- 				<!-- SIR -->
-				<div class="-row -content-left" style="padding:1.5em">
-					<span>S.I.R CUSTOMIZADO (PREDIÇÃO C/ I.A)</span>
-					<div class="-absolute -col-4 -zero-bottom" style="height:1px;background-image: linear-gradient(to right, #00000044, transparent)"></div>
-				</div>
- 				<div class="-row">
- 					<!-- ACUMULATED CASES -->
- 					<div class="-row -left" style="padding: 2em 1em 2em;height:24em">
- 						<span class="-right" style="padding:0 1em">SÉRIE TOTAL</span>
- 						<div class="-wrapper --home-sir-graph" style="margin:1em 0"></div>
- 					</div>
- 				</div>
+ 				<section class="-row -scrolls" style="height:calc(100% - 4em)">
 
- 				<!-- CONFIRMED -->
- 				<div class="-left -col-6">
-					<div class="-row -content-left" style="padding:1.5em;margin-top:2em">
-						<span>CASOS CONFIRMADOS (ÚLTIMOS 60 DIAS)</span>
-						<div class="-absolute -col-4 -zero-bottom" style="height:1px;background-image: linear-gradient(to right, #00000044, transparent)"></div>
-					</div>
-	 				<div class="-row">
-	 					<!-- ACUMULATED CASES -->
-	 					<div class="-row -left" style="padding: 2em 1em 2em;height:16em">
-	 						<span class="-right" style="padding:0 1em">ACUMULADOS</span>
-	 						<div class="-wrapper --home-accumulated-infected-graph" style="margin:1em 0"></div>
-	 					</div>
-	 					<!-- DAILY CASES -->
-	 					<div class="-row -left" style="padding: 2em 2em 2em 1em;height:8em">
-	 						<span class="-right" style="padding:0 1em">DIÀRIOS</span>
-	 						<div class="-wrapper --home-daily-infected-graph" style="margin:1em 0"></div>
-	 					</div>
-	 				</div>
-	 			</div>
+ 					<!-- SIR -->
+					<section class="-row" style="color:#27283D;margin-bottom: 2em">
+						<div class="-row -content-left" style="padding:1.5em;margin-top:4em">
+							<span>I.A. SIR CUSTOMIZADO</span>
+							<div class="-absolute -col-4 -zero-bottom" style="height:1px;background-image: linear-gradient(to right, #00000044, transparent)"></div>
+						</div>
 
- 				<!-- DEATHS-->
- 				<div class="-left -col-6">
-	 				<div class="-row -content-left" style="padding:1.5em;margin-top:2em">
-						<span>MORTES (ÚLTIMOS 60 DIAS)</span>
-						<div class="-absolute -col-4 -zero-bottom" style="height:1px;background-image: linear-gradient(to right, #00000044, transparent)"></div>
-					</div>
-	 				<div class="-row">
-	 					<!-- ACUMULATED CASES -->
+	 					<!-- WHOLE SERIES CASES -->
+	 					<div class="-row -left" style="padding: 2em 1em 2em;height:16em;margin-top:2em">
+	 						<span class="-right" style="padding:0 1em">(I.A. SIR CUSTOMIZADO) SÉRIES TOTAIS</span>
+	 						<div class="-wrapper --home-sir-accumulated-graph"></div>
+	 					</div>
+
+						<div class="-row -content-center" style="font-size: .75em;">
+							<div class='-col-8'>
+
+								<!-- [ "#2C97DD88", "#D3531388", "#53D78B88" ] -->
+								<div class="-left -col-4">
+									<div class="-left" style="height:1em;width:1em;border-radius:.5em;background:#2C97DD88;margin:1em"></div>
+									<span class="-left" style="padding:1em">NÃO INFECTADOS</span>
+								</div>
+								<div class="-left -col-4">
+									<div class="-left" style="height:1em;width:1em;border-radius:.5em;background:#D3531388;margin:1em"></div>
+									<span class="-left" style="padding:1em">INFECTADOS</span>
+								</div>
+								<div class="-left -col-4">
+									<div class="-left" style="height:1em;width:1em;border-radius:.5em;background:#53D78B88;margin:1em"></div>
+									<span class="-left" style="padding:1em">RECUPERADOS</span>
+								</div>
+							</div>
+						</div>
+
+	 				</section>
+
+
+	 				<!-- SIR -->
+	 				<section class="-row" style="color:#2C97DD">
+						<div class="-row -content-left" style="padding:1.5em;margin-top:4em">
+							<span>INFECTADOS</span>
+							<div class="-absolute -col-4 -zero-bottom" style="height:1px;background-image: linear-gradient(to right, #00000044, transparent)"></div>
+						</div>
+
+						<!-- DAILY CASES -->
 	 					<div class="-row -left" style="padding: 2em 1em 2em;height:16em">
+	 						<span class="-right" style="padding:0 1em">(I.A. SIR CUSTOMIZADO) CASOS DIÁRIOS</span>
+	 						<div class="-wrapper --home-sir-daily-infected-graph"></div>
+	 					</div>
+		 				
+		 				<!-- CONFIRMED -->
+						<div class="-row -content-left" style="padding:1.5em;">
+							<span>CASOS CONFIRMADOS OFICIAIS (ÚLTIMOS 30 DIAS)</span>
+							<div class="-absolute -col-4 -zero-bottom" style="height:1px;background-image: linear-gradient(to right, #00000044, transparent)"></div>
+						</div>
+
+	 					<!-- ACUMULATED CASES -->
+	 					<div class="-col-6 -left" style="padding: 2em 1em 2em;height:16em">
 	 						<span class="-right" style="padding:0 1em">ACUMULADOS</span>
-	 						<div class="-wrapper --home-accumulated-deaths-graph" style="margin:1em 0"></div>
+	 						<div class="-wrapper --home-accumulated-infected-graph"></div>
 	 					</div>
+
 	 					<!-- DAILY CASES -->
-	 					<div class="-row -left" style="padding: 2em 2em 2em 1em;height:8em">
+	 					<div class="-col-6 -left" style="padding: 2em 2em 2em 1em;height:16em">
 	 						<span class="-right" style="padding:0 1em">DIÀRIOS</span>
-	 						<div class="-wrapper --home-daily-deaths-graph" style="margin:1em 0"></div>
+	 						<div class="-wrapper --home-daily-infected-graph"></div>
 	 					</div>
-	 				</div>
-	 			</div>
- 				<div class="-row" style="height:24em"></div>
+	 			 	</section>
+	 				
+
+	 				<!-- DEATHS-->
+	 				<section class="-row" style="color:#E84C3D">
+		 				<div class="-row -content-left" style="padding:1.5em;margin-top:4em;">
+							<span>MORTES</span>
+							<div class="-absolute -col-4 -zero-bottom" style="height:1px;background-image: linear-gradient(to right, #00000044, transparent)"></div>
+						</div>
+
+	 					<!-- DAILY DEATHS -->
+	 					<div class="-row -left" style="padding: 2em 1em 2em;height:16em">
+	 						<span class="-right" style="padding:0 1em">(I.A. CASOS CUSTOMIZADOS) MORTES DIÁRIAS</span>
+	 						<div class="-wrapper --home-sir-deaths-graph"></div>
+	 					</div>
+
+	 					<div class="-row -content-left" style="padding:1.5em;">
+							<span>MORTES OFICIAIS (ÚLTIMOS 30 DIAS)</span>
+							<div class="-absolute -col-4 -zero-bottom" style="height:1px;background-image: linear-gradient(to right, #00000044, transparent)"></div>
+						</div>
+
+		 				<!-- ACUMULATED CASES -->
+	 					<div class="-col-6 -left" style="padding: 2em 1em 2em;height:16em">
+	 						<span class="-right" style="padding:0 1em">ACUMULADAS</span>
+	 						<div class="-wrapper --home-accumulated-deaths-graph"></div>
+	 					</div>
+
+	 					<!-- DAILY CASES -->
+	 					<div class="-col-6 -left" style="padding: 2em 2em 2em 1em;height:16em">
+	 						<span class="-right" style="padding:0 1em">DIÀRIAS</span>
+	 						<div class="-wrapper --home-daily-deaths-graph"></div>
+	 					</div>
+			 		</section>
+		 			<!-- PADDING -->
+	 				<div class="-row" style="height:24em"></div>
+
+	 			</section>
  			</div>
  		</div>
  	</div>
