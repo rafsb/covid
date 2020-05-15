@@ -82,7 +82,7 @@ bootloader.loadComponents.add(_=>{
 
 app.onPragmaChange.add(x => {
 
-	if(!bootloader.ready()) return seTimeout(x => app.pragma = x, ANIMATION_LENGTH, x);
+	if(!bootloader.ready()) return;//setTimeout(x => app.pragma = x, ANIMATION_LENGTH, x);
 
 	app.last = app.current;
 	app.current = x;
