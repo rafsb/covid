@@ -24,6 +24,7 @@ bootloader.loaders = {
 	, worldjson  : 0
 	, statesarray: 0
 	, menujs 	 : 0
+	, sir:0
 };
 
 bootloader.loadComponents.add(_=>{
@@ -71,6 +72,11 @@ bootloader.loadComponents.add(_=>{
 					bootloader.ready("menujs")
 				});
 
+				app.call("var/Brazil/csir.json").then(x => {
+					app.data.Brazil.csir = x.data.json()
+					bootloader.ready("sir")
+				})
+
 			});
 
 		// LOGIN
@@ -108,8 +114,7 @@ app.onPragmaChange.add(x => {
 	, daily_infected     = x.dc || []
 	, daily_deaths       = x.dd || []
 	, labels  = app.data.Brazil.serie.keys().extract(x => x.split("-").slice(1).join("/")).last(qtty)
-	, sir_k = []
-	, sir_s = []
+	, sir
 	;
 	
 	if(x === true) {
@@ -122,11 +127,12 @@ app.onPragmaChange.add(x => {
 			daily_infected.push(x.content.dc);
 			daily_deaths.push(x.content.dd);
 		});
-	} else{
+
 		//sir_k = [ "SIR" ] 
-		sir_k = app.data.Brazil.innerserie[x.state][x.name].csir.keys() || [];
-		// sir_s = app.data.Brazil.innerserie[x.state][x.name].csir.line.first(80)
-		sir_s = app.data.Brazil.innerserie[x.state][x.name].csir.extract(s => s.content.first(100)) || [];
+		sir = app.data.Brazil.csir || {};
+
+	} else {
+		sir = app.data.Brazil.innerserie[x.state][x.name].csir || {};
 	}
 	
 	confirmed_infected = confirmed_infected.cast(NUMBER).last(qtty);
@@ -172,33 +178,44 @@ app.onPragmaChange.add(x => {
 	let
 	csir_graph = new Graph({
 		target: $("#home .--home-sir-accumulated-graph").at().empty()
-		, series: [ sir_s[0], sir_s[1] , sir_s[2] ]
-		, names: [ "não infectados", "infectados", "recuperados" ]
-		, labels: app.iter(80)
+		, series: [ sir.susceptible, sir.infected, sir.recovered, sir.deaths ]
+		, names:  [ "não infectados", "infectados", "recuperados", "mortes" ]
 		, lines: { css: { 
-			color: [ "#2C97DD88", "#D3531388", "#53D78B88" ] 
-			, "stroke-width": [ 2, 6, 2 ]
-			, "stroke-dasharray" : [ 2, null, 2 ]
+			color: [ "#888", "#D3531388", "#2C97DD88", "#f008" ] 
+			, "stroke-width": [ 2, 6, 2, 2 ]
+			, "stroke-dasharray" : [ 1, 0, 4, 4 ]
 		} }
-		, type: "smooth"
+		, labels: app.iter(100)
+		, type: "line"
 	})
 	, dsir_graph = new Graph({
 		target: $("#home .--home-sir-deaths-graph").at().empty()
-		, series: [ sir_s[6] ]
-		, names: [ "mortes" ]
-		, labels: app.iter(80)
+		, series: [ sir.daily_deaths ]
+		, names: [ "mortes diárias" ]
+		, labels: app.iter(100)
 		, lines: { css: { color: "#f00D" } }
 		, type: "bars"
 	})
 	, dcsir_graph = new Graph({
 		target: $("#home .--home-sir-daily-infected-graph").at().empty()
-		, series: [ sir_s[5] ]
-		, names: [ "infectados" ]
-		, labels: app.iter(80)
+		, series: [ sir.daily_infected ]
+		, names: [ "infectados diários" ]
+		, labels: app.iter(100)
 		, lines: { css: { color: "#D35313" } }
 		, type: "bars"
 	})
 	;
+
+	let
+	deathpeak = sir.daily_deaths.indexOf(sir.daily_deaths.calc(MAX))
+	, infectpeak = sir.daily_infected.indexOf(sir.daily_infected.calc(MAX))
+	, dpl = csir_graph.node.get(".--iter"+deathpeak)[0].mimic().remClass("-hint-plate").attr({ width: 1 }).css({ fill: "#f00D", opacity:.64 })
+	, ipl = csir_graph.node.get(".--iter"+infectpeak)[0].mimic().remClass("-hint-plate").attr({ width: 1 }).css({ fill: "#D35313", opacity:.64 })
+	;
+
+	csir_graph.node.app(dpl).app(ipl)
+	.app(_S("text", "--text", { x: dpl.getAttribute("x")*1+12, y: 12 }, { stroke: "#f00D" }).text("PICO DE MORTES"))
+	.app(_S("text", "--text", { x: ipl.getAttribute("x")*1+12, y: 12 }, { fill: "#D35313" }).text("PICO DE CASOS DIÁRIOS"));
 
 	app.cx = setInterval(xc => { 
 			

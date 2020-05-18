@@ -25,6 +25,15 @@ class Content extends Activity
 		return $return;
 	}
 
+	public function csir(String $countryname){
+		$path = IO::root("var/$countryname");
+		if(is_dir($path)) $return = IO::jout("$path/total.json");
+		else return Core::response(-1, "no country folder found");
+		print_r($return);die;
+		if(!isset($return->csir)) return Core::response(-2, "no SIR done yet");
+		return $return->csir;
+	}
+
 	public function states(String $countryname){
 		$return = "";
 		$path = IO::root("var/$countryname");

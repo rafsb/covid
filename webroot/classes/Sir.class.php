@@ -12,12 +12,11 @@ class __Cell__
 	private $deaths_array      = [];
 	
 	private $length	  = 360;
-	private $r        = 2.5;
+	private $r        = 1.02;
 	
-	public $latency   = 6;
-	public $period    = 19;
-	public $mortality = .017;
-	public $affected_pop_factor = .75;
+	public $latency   	 = 6;
+	public $restore_time = 19;
+	public $mortality    = .0017;
 
 	public function pop(int $p=null){
 		if($p !== null) $this->susceptible = $p;
@@ -35,73 +34,84 @@ class __Cell__
 	}
 
 	public function gen(){
-		$s_a = &$this->susceptible_array;
-		$i_a = &$this->infected_array;
-		$r_a = &$this->recovered_array;
-		$d_a = &$this->deaths_array;
-		$s = &$this->susceptible;
-		$i = &$this->infected;
-		$r = &$this->recovered;
-		$d = &$this->deaths;
+		$s_a = array_fill(0, $this->length, 0);
+		$i_a = array_fill(0, $this->length, 0);
+		$r_a = array_fill(0, $this->length, 0);
+		$d_a = array_fill(0, $this->length, 0);
 
-		$l = $this->susceptible;
-		$p = $this->period;
-		$m = $this->mortality;
+		$mainline	    = array_fill(0, $this->length, 0);
+		$daily_infected = array_fill(0, $this->length, 0);
+		$daily_deaths   = array_fill(0, $this->length, 0);
+			
+		$R            = 1 + $this->r / $this->latency;
+		$mortality    = $this->mortality;
+		$restore_time = $this->restore_time;
+		$population   = $this->susceptible;
 
-		$s_a[] = $s;
-		$i_a[] = $i;
-		$r_a[] = $r;
-		$d_a[] = $d;
+		$susceptible  = $this->susceptible;
+		$infected     = 1;
+		$recovered    = 0;
+		$deaths   	  = 0;
 
-		$line    = [];
-		$daily_i = [];
-		$daily_d = [];
+		$yesterday = [
+			"deaths" => 0
+			, "infected" => 0
+		];
 
-		$mult = $this->r / $this->latency;
-		$max = $this->affected_pop_factor;
+		Loop::iterate(0, $this->length, function($iter) use (&$s_a, &$i_a, &$r_a, &$d_a	, &$susceptible, &$infected, &$recovered, &$deaths, $R, $mortality, $restore_time, $population, &$mainline, &$daily_infected, &$daily_deaths, &$yesterday){
 
-		// echo $this->r . ", " . $this->latency . "PHP_EOL";
-
-		Loop::iterate(0, $this->length, function($iter) use (&$s, &$i, &$r, &$d, &$s_a, &$i_a, &$r_a, &$d_a, &$line, &$daily_i, &$daily_d, $p, $l, $m, $mult, $max){
-
-			$rec = 0;
-
-			if($iter >= $p){
-				$rec = $i_a[$iter - $p]; 
-			 	$d = ($rec * $m);
-			 	$r = $rec - $d;
+			$infected = min($population, $infected * $R * $susceptible / $population);
+			$susceptible = max(0, $population - $infected);
+			
+			if($iter >= $restore_time){
+				$recovered = max($recovered, $i_a[$iter - $restore_time] - $d_a[$iter - $restore_time]);
+				$deaths    += max(0, ($mainline[$iter - $restore_time] * $mortality));
 			}
 
-			$s = $l - $i;
-			$i += $i * $mult * $s / $l;
-			
-			$s_a[] = floor($s);
-			$i_a[] = floor($i);
-			$r_a[] = floor($r);
-			$d_a[] = floor($d);
+			$mainline[$iter] = $infected - $recovered - $deaths;
+			if($iter == 0){
+				$daily_infected[$iter] = $infected;
+				$daily_deaths[$iter]   = $deaths;
+			} else {
+				$daily_infected[$iter] = $infected - $yesterday["infected"];
+				$daily_deaths[$iter]   = $deaths - $yesterday["deaths"];
+			}
 
-			$line[] = floor($i - $r - $d);
-			$daily_i[] = $iter ? $i_a[$iter] - $i_a[$iter - 1] : $i_a[$iter];
-			$daily_d[] = $iter ? $d_a[$iter] - $d_a[$iter - 1] : $d_a[$iter];
+			$s_a[$iter] = $susceptible;
+			$i_a[$iter] = $infected;
+			$r_a[$iter] = $recovered;
+			$d_a[$iter] = $deaths;
 
-			//echo "$mult\n";
+			$yesterday["infected"] = $infected;
+			$yesterday["deaths"] = $deaths;
 		});
 
-		$i = 0;
-		while($line[$i]<10&&++$i<sizeof($line));
-		
-		$j = sizeof($line)-1;
-		while($line[$j]<10&&--$j>0);
+		$start = 0;
+		while($mainline[$start] < 1000 && ++$start < sizeof($mainline));
 
-		return Convert::atoo([
-			"susceptible" => $i<$j ? array_slice($s_a, $i, $j) : []
-			, "infected"  => $i<$j ? array_slice($i_a, $i, $j) : []
-			, "recovered" => $i<$j ? array_slice($r_a, $i, $j) : []
-			, "deaths"    => $i<$j ? array_slice($d_a, $i, $j) : []
-			, "line"      => $i<$j ? array_slice($line, $i, $j) : []
-			, "daily_infected" => $i<$j ? array_slice($daily_i, $i, $j) : []
-			, "daily_deaths"   => $i<$j ? array_slice($daily_d, $i, $j) : []
-		]);
+		$end = sizeof($daily_deaths);
+		while($daily_deaths[--$end]<10 && $end > 10);
+
+		$this->susceptible_array = $start < $end ? array_slice($s_a, $start, $end-$start) : [];
+		$this->infected_array    = $start < $end ? array_slice($i_a, $start, $end-$start) : [];
+		$this->recovered_array   = $start < $end ? array_slice($r_a, $start, $end-$start) : [];
+		$this->deaths_array      = $start < $end ? array_slice($d_a, $start, $end-$start) : [];
+		$this->mainline          = $start < $end ? array_slice($mainline		, $start, $end-$start) : [];
+		$this->daily_deaths      = $start < $end ? array_slice($daily_deaths	, $start, $end-$start) : [];
+		$this->daily_infected    = $start < $end ? array_slice($daily_infected	, $start, $end-$start) : [];
+
+		$return = [
+			"susceptible" => $this->susceptible_array
+			, "infected"  => $this->infected_array
+			, "recovered" => $this->recovered_array
+			, "deaths"    => $this->deaths_array
+			, "line"    		=> $this->mainline
+			, "daily_infected"  => $this->daily_infected
+			, "daily_deaths"    => $this->daily_deaths
+		];
+		// print_r($return); die;
+
+		return $return;
 	}
 
 	public static function make(int $pop=null, int $initial_r=null, int $max_days_to_predict=null){
@@ -126,5 +136,9 @@ class Sir extends Activity
 	public static function serie(int $pop=null, int $initial_r=null, int $max_days_to_predict=null,array $known_deaths=[]){
 		$sir = __Cell__::make($pop, $initial_r, $max_days_to_predict);
 		return $sir;
+	}
+
+	public static function web(int $pop=null, int $initial_r=null, int $max_days_to_predict=null,array $known_deaths=[]){
+		return Convert::json(__Cell__::make($pop, $initial_r, $max_days_to_predict));
 	}
 }
