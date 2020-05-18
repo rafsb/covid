@@ -77,7 +77,7 @@ $bg = $files[random_int(0,sizeof($files)-1)];
 						</div>
 						
 	 					<!-- WHOLE SERIES CASES -->
-	 					<div class="-row -left" style="padding: 2em 1em 2em;height:16em;margin-top:2em">
+	 					<div class="-row -left" style="padding: 2em 1em 2em;height:16em;">
 	 						<span class="-right" style="padding:0 1em">SÉRIES TOTAIS</span>
 	 						<div class="-wrapper --home-sir-accumulated-graph"></div>
 	 					</div>
