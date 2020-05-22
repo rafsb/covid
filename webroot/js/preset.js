@@ -41,6 +41,8 @@ bootloader.loadComponents.add(_=>{
 
 		// USER IS LOGGED ?
 		if(app.hash){
+
+			app.call("reg/save/"+app.hash+"_=_"+(new Date()).export());
 			
 			app.load("/webroot/views/xhr/splash.php");
 			app.exec("/webroot/js/helpers.js");
