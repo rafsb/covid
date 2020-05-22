@@ -94,7 +94,7 @@ app.onPragmaChange.add(x => {
 	app.last = app.current;
 	app.current = x;
 
-	console.log(x)
+	// console.log(x)
 
 	let
 	container = $("#home")[0]
@@ -134,11 +134,11 @@ app.onPragmaChange.add(x => {
 		sir_s = app.data.Brazil.csir || [];
 	} else {		
 		// sir_s = app.data.Brazil.innerserie[x.state][x.name].csir.line.first(80)
-		console.log(x.state, x.name)
+		// console.log(x.state, x.name)
 		sir_s = app.data.Brazil.innerserie[x.state][x.name].csir || [];
 	}
 
-	console.log(sir_s)
+	// console.log(sir_s)
 	
 	confirmed_infected = confirmed_infected.cast(NUMBER).last(qtty);
 	confirmed_deaths   = confirmed_deaths.cast(NUMBER).last(qtty);
