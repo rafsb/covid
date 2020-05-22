@@ -15,8 +15,8 @@ if(!User::logged() && Request::cook("USER") && Request::cook("ACTIVE")) Request:
 $args = Request::in("_");
 if($args)
 {   
-    if(substr($args,0,1)==DS) $args = substr($args,1);
-    $args = explode('/',$args);
+    if(substr($args, 0, 1)==DS) $args = substr($args, 1);
+    $args = explode('/', $args);
     $class_name  = ucfirst($args[0]);
     $method_name = isset($args[1]) && $args[1] ? $args[1] : "render";
     
@@ -30,7 +30,7 @@ if($args)
         IO::debug($e);
     }
 
-}else \App::init();
+}else App::init();
 
 flush();
 

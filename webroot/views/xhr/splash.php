@@ -14,7 +14,7 @@
 				$("#splash .--progressbar")[0].anime({ width: Math.ceil(perc*100)+"%" }, ANIMATION_LENGTH*4)
 			})
 			bootloader.onFinishLoading.add(_ => $("#splash")[0].anime({ filter:"invert(0)" }, ANIMATION_LENGTH*2).then(el => el.desappear(ANIMATION_LENGTH*2, true)))
-			bootloader.ready("splash")
+			setTimeout(_ => bootloader.ready("splash"), ANIMATION_LENGTH);
 		</script>
 	</section>
 </template>

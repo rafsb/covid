@@ -13,89 +13,130 @@
 
 echo PHP_EOL;
 
-$population_array = IO::jout("var/Brazil/population.json");
-$population_names_array = array_keys((array)$population_array);
-
-$virus_population = 0;
-
-Vector::each($content, function($line, $i) use (&$country, &$virus_population, $population_array, $population_names_array){ 
+Vector::each($content, function($line, $i) use (&$country){ 
 	
 	// Just valid data accept
 	if($i&&isset($line[3])){
 
 		// get fields from CSV
-		$_Date_ 				 = isset($line[0])  ? $line[0]  : date('Y-m-d');
-		$_State_ 				 = isset($line[2])  ? $line[2]  : 'UNIÃO';
-		$_Confirmed	 	 		 = isset($line[8])  ? max(0, $line[8])  : 0;
-		$_Confirmed_per_day		 = isset($line[7])  ? max(0, $line[7])  : 0;
-		$_Confirmed_per_100k_hab = isset($line[10]) ? max(0, $line[10]) : 0;
-		$_Deaths				 = isset($line[6])  ? max(0, $line[6])  : 0;
-		$_Deaths_per_day		 = isset($line[5])  ? max(0, $line[5])  : 0;
-		$_Deaths_per_100k_hab	 = isset($line[9])  ? max(0, $line[9])  : 0;
-		$_Deaths_per_confirmed	 = isset($line[11]) ? max(0, $line[11]) : 0;
-		$_Name 				 	 = explode(DS, $line[3])[0] . DS . $_State_;
-		$_Population 			 = in_array($_Name, $population_names_array)&& $_Name!='TOTAL/TOTAL'? $population_array->{$_Name} : 1;
+		$date 				 	= isset($line[0])  ? $line[0]  : date('Y-m-d');
+		$state 				 	= isset($line[2])  ? $line[2]  : 'UNIÃO';
+		$confirmed	 	 		= isset($line[8])  ? max(0, $line[8])  : 0;
+		$confirmed_per_day		= isset($line[7])  ? max(0, $line[7])  : 0;
+		$confirmed_per_100k_hab = isset($line[10]) ? max(0, $line[10]) : 0;
+		$deaths				 	= isset($line[6])  ? max(0, $line[6])  : 0;
+		$deaths_per_day		 	= isset($line[5])  ? max(0, $line[5])  : 0;
+		$deaths_per_100k_hab	= isset($line[9])  ? max(0, $line[9])  : 0;
+		$deaths_perconfirmed	= isset($line[11]) ? max(0, $line[11]) : 0;
+		$name 				 	= explode(DS, $line[3])[0] . DS . $state;
+		// $population 			= in_array($name, $population_names_array)&& $name!='TOTAL/TOTAL'? $population_array->{$name} : 1;
+
+		// echo ' => translating (csv2json): ' . $name . '\r';
 
 		// sum the total population that is visible by the virus
-		$virus_population += $_Population;
+		// $virus_population += $population;
 
 		// set state structure
-		if(!isset($country[$_State_])) $country[$_State_] = [ ];
+		if(!isset($country["states"])) $country["states"] = [];
+		if(!isset($country["states"][$state])) $country["states"][$state] = [ ];
 		
 		// create new or inherit from exixting city structure
-		if(!isset($country[$_State_][$_Name])) $city = [ ];
-		else $city = $country[$_State_][$_Name];
+		if(!isset($country["states"][$state][$name])) $city = [ ];
+		else $city = $country["states"][$state][$name];
 
-		if(!isset($city['pop'])) $city['pop'] = $_Population;
-		else $city['pop'] += $_Population;
+		// if(!isset($city['pop'])) $city['pop'] = $population;
+		// else $city['pop'] = $population;
 
 		// set city's fields
-		if(!isset($city['state'])) $city['state'] = $_State_;
+		if(!isset($city['state'])) $city['state'] = $state;
 		if(!isset($city['series'])) $city['series'] = [];
 
 		// create am empty city temporal serie node if not exists
-		if(!isset($city['series'][$_Date_])) $city['series'][$_Date_] = [
+		if(!isset($city['series'][$date])) $city['series'][$date] = [
 			'c' 		=> 0
 			, 'dc' 	=> 0
 			, 'd' 		=> 0
 			, 'dd' 	=> 0
 		];
 
-		if(!isset($city["csir"])) $city["csir"] = Sir::serie($_Population);
+		// if(!isset($city["csir"])) $city["csir"] = Sir::serie($population);
 
 		// fill each temporal serie node
-		$city['series'][$_Date_]['c'] 	+= $_Confirmed;;
-		$city['series'][$_Date_]['dc'] 	+= $_Confirmed_per_day;
-		$city['series'][$_Date_]['d'] 	+= $_Deaths;
-		$city['series'][$_Date_]['dd'] 	+= $_Deaths_per_day;
+		$city['series'][$date]['c']  += $confirmed;;
+		$city['series'][$date]['dc'] += $confirmed_per_day;
+		$city['series'][$date]['d']  += $deaths;
+		$city['series'][$date]['dd'] += $deaths_per_day;
 
 		// assign temporary city data to main variable
-		$country[$_State_][$_Name] = $city;
+		$country["states"][$state][$name] = $city;
 
 	// print no valid data
 	}
 
 });
 
+echo PHP_EOL;
+
+
+$population_array = IO::jout("var/Brazil/population.json");
+$population_names_array = array_keys((array)$population_array);
+$virus_population = 0;
+$states = (array)$country["states"];
+
+Vector::each($states, function($statedata, $statename) use (&$country, &$virus_population, $population_array, $population_names_array) {
+ 	Vector::each($statedata, function($citydata, $cityname) use (&$country, &$virus_population, $population_array, $population_names_array, $statename){ 
+ 		// echo ' => assign population and cSIR: ' . $cityname . '\r';
+ 		$citydata['pop'] = in_array($cityname, $population_names_array) && $cityname!='TOTAL/TOTAL' ? $population_array->{$cityname} : 1;
+ 		$virus_population += $citydata['pop'];
+ 		$country["states"][$statename][$cityname]["csir"] = Sir::serie($citydata["pop"], 3.4, .2, 100, Vector::extract($citydata["series"], function($d){ return $d["d"]&&$d["d"]*1 ? $d["d"] : null; }));
+ 		// if($cityname=="São Paulo/SP"){ 
+ 		// 	echo $citydata["pop"];
+ 		// 	// print_r(Vector::extract($citydata["series"], function($d){ return $d["d"]&&$d["d"]*1 ? $d["d"] : null; }));
+ 		// 	print_r(Sir::serie($citydata["pop"], 3.4, .25, 100, Vector::extract($citydata["series"], function($d){ return $d["d"]&&$d["d"]*1 ? $d["d"] : null; }), false)); 
+ 		// 	die; 
+ 		// }
+ 	});
+});
 
 $country['pop'] = $virus_population;
+
+$csir = null;
+Vector::each($states, function($statedata, $statename) use (&$csir, $country) {
+ 	Vector::each($statedata, function($citydata, $cityname) use (&$csir, $country, $statename){ 
+ 		$tmp = $country["states"][$statename][$cityname]["csir"];
+ 		if(!$csir) $csir = $tmp;
+ 		else {
+ 			if($tmp) Vector::each($tmp, function($arr, $name) use(&$csir){
+ 				Vector::each($arr, function($n, $i) use(&$csir, $name){
+ 					$csir[$name][$i] += max(0, $n*1);
+ 				});
+ 			});
+ 		}
+ 	});
+});
+
+$country['csir'] = $csir;
+IO::jin("var/Brazil/csir.json", $csir);
+
+echo PHP_EOL;
 
 /*
  * the raw data of the country is now too big
  * so, we'll split into small satte's files
  * it will reduce impact on UX
  */
-Vector::async($country, function($statedata, $statename){
+Vector::async($country["states"], function($statedata, $statename){
 	
 	// only accept valid data
 	if(!is_array($statedata)) return;
 
 	// show current state in chain
-	echo ' => parsing ' . $statename . PHP_EOL;
+	echo ' => spliting documents: ' . $statename . PHP_EOL;
 	
-	// check if is a real state or the totalization cell
-	// the totalization cell is ready to be written to disk
-	// but will not be separated in a folder
+	/* check if is a real state or the totalization cell
+	 * the totalization cell is ready to be written to disk
+	 * but will not be separated in a folder
+	 */
 	if($statename == 'TOTAL') {
 		
 		$path = 'var/Brazil';

@@ -22,6 +22,7 @@ bootloader.loaders = {
 	, helpers    : 0
 	, theme 	 : 0
 	, worldjson  : 0
+	, worldcsir  : 0
 	, statesarray: 0
 	, menujs 	 : 0
 };
@@ -50,8 +51,14 @@ bootloader.loadComponents.add(_=>{
 				else app.error("Error loading World's timeseries...");
 			});
 
+			app.call("/var/Brazil/csir.json").then(csir => {				
+				app.data.Brazil.csir = csir.data.json();
+				if(app.data.Brazil.csir) bootloader.ready("worldcsir");
+				else app.error("Error loading World's timeseries...");
+			});
+
 			app.call("/content/states/Brazil").then(states => {
-				states = states.data.json();				
+				states = states.data.json();			
 				if(states.length){
 					states.each(s => bootloader.loaders[s] = false);
 					app.data.Brazil.innerserie = {};
@@ -87,12 +94,14 @@ app.onPragmaChange.add(x => {
 	app.last = app.current;
 	app.current = x;
 
+	console.log(x)
+
 	let
 	container = $("#home")[0]
 	, conf = container.get(".--confirmed")[0]
 	, deat = container.get(".--deaths")[0]
 	, qtty = 60
-	, sir_color = app.colors("EMERLAND") 
+	, sir_color = app.colors("MIDNIGHT_BLUE") 
 	, infect_color = app.colors("PETER_RIVER") 
 	, death_color = app.colors("ALIZARIN")
 	;
@@ -122,30 +131,22 @@ app.onPragmaChange.add(x => {
 			daily_infected.push(x.content.dc);
 			daily_deaths.push(x.content.dd);
 		});
-	} else{
-		//sir_k = [ "SIR" ] 
-		sir_k = app.data.Brazil.innerserie[x.state][x.name].csir.keys() || [];
+		sir_s = app.data.Brazil.csir || [];
+	} else {		
 		// sir_s = app.data.Brazil.innerserie[x.state][x.name].csir.line.first(80)
-		sir_s = app.data.Brazil.innerserie[x.state][x.name].csir.extract(s => s.content.first(100)) || [];
+		console.log(x.state, x.name)
+		sir_s = app.data.Brazil.innerserie[x.state][x.name].csir || [];
 	}
+
+	console.log(sir_s)
 	
 	confirmed_infected = confirmed_infected.cast(NUMBER).last(qtty);
 	confirmed_deaths   = confirmed_deaths.cast(NUMBER).last(qtty);
 	daily_infected     = daily_infected.cast(NUMBER).last(qtty);
 	daily_deaths       = daily_deaths.cast(NUMBER).last(qtty);
 
-	console.log(sir_s.length, sir_k.length, app.iter(100).length);
-
 	let
-	sir_graph = new Graph({
-		target: $("#home .--home-sir-graph").at().empty()
-		, series: sir_s
-		, names: sir_k
-		, labels: app.iter(80)
-		, lines: { css: { color: sir_color } }
-		, type: "smooth"
-	})
-	, acc_conf_graph = new Graph({
+	acc_conf_graph = new Graph({
 		target: $("#home .--home-accumulated-infected-graph").at().empty()
 		, series: [ confirmed_infected ]
 		, labels: labels
@@ -177,6 +178,37 @@ app.onPragmaChange.add(x => {
 		, lines: { css: { color: death_color } }
 		, type: "bars"
 	})
+	; 
+
+	let
+	csir_graph = new Graph({
+		target: $("#home .--home-sir-accumulated-graph").at().empty()
+		, series: [ sir_s.susceptible, sir_s.infected, sir_s.recovered, sir_s.deaths, sir_s.line ]
+		, names: [ "não infectados", "infectados", "recuperados", "mortes", "serie de infectados" ]
+		, labels: app.iter(80)
+		, lines: { css: { 
+			color: [ "#2C97DD88", "#D3531388", "#53D78B88", death_color, "#0003" ] 
+			, strokeWidth: [ 2, 4, 2, 4, 12 ]
+		} }
+		, type: "smooth"
+	})
+	, dsir_graph = new Graph({
+		target: $("#home .--home-sir-deaths-graph").at().empty()
+		, series: [ sir_s.daily_deaths ]
+		, names: [ "mortes" ]
+		, labels: app.iter(qtty)
+		, lines: { css: { color: death_color } }
+		, type: "bars"
+	})
+	, dcsir_graph = new Graph({
+		target: $("#home .--home-sir-daily-infected-graph").at().empty()
+		, series: [ sir_s.daily_infected ]
+		, names: [ "infectados" ]
+		, labels: app.iter(qtty)
+		, lines: { css: { color: infect_color } }
+		, type: "bars"
+	})
+	;
 
 	app.cx = setInterval(xc => { 
 			

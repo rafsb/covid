@@ -33,4 +33,12 @@ class Content extends Activity
 		return $return;
 	}
 
+	public function csir(String $countryname){
+		$return = "";
+		$path = IO::root("var/$countryname/csir.json");
+		if(is_file($path)) $return = IO::read($path);
+		else $return = Core::response(-1, "no country's csir file found");
+		return $return;
+	}
+
 };
