@@ -88,6 +88,7 @@ Vector::each($states, function($statedata, $statename) use (&$country, &$virus_p
  		// echo ' => assign population and cSIR: ' . $cityname . '\r';
  		$citydata['pop'] = in_array($cityname, $population_names_array) && $cityname!='TOTAL/TOTAL' ? $population_array->{$cityname} : 1;
  		$virus_population += $citydata['pop'];
+ 		echo $cityname . "/" . $statename . PHP_EOL;
  		$country["states"][$statename][$cityname]["csir"] = Sir::serie($citydata["pop"], 3.4, .2, 100, Vector::extract($citydata["series"], function($d){ return $d["d"]&&$d["d"]*1 ? $d["d"] : null; }));
  		// if($cityname=="São Paulo/SP"){ 
  		// 	echo $citydata["pop"];
@@ -108,6 +109,7 @@ Vector::each($states, function($statedata, $statename) use (&$csir, $country) {
  		else {
  			if($tmp) Vector::each($tmp, function($arr, $name) use(&$csir){
  				Vector::each($arr, function($n, $i) use(&$csir, $name){
+ 					if(!isset($csir[$name][$i])) $csir[$name][$i] = 0;
  					$csir[$name][$i] += max(0, $n*1);
  				});
  			});

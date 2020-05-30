@@ -15,9 +15,9 @@ class __Cell__
 	private $r        = 2.4;
 	
 	public $latency   	 = 6;
-	public $restore_time = 14;
+	public $restore_time = 19;
 	public $infected_cap_factor = .225;
-	public $mortality    = .0017;
+	public $mortality    = .0013;
 
 	public function pop(int $p=null){
 		if($p !== null) $this->susceptible = $p;
@@ -49,42 +49,49 @@ class __Cell__
 		$daily_infected = [];
 		$R = $this->r / $this->latency;
 		$population  = $this->susceptible * $infected_cap_factor;
+		echo "pop: " . $population . PHP_EOL;
 		Loop::iterate(0, $this->length, function() use (&$infected_array, &$infected, &$daily_infected, $R, $population){
 			$tmp = $infected;
 			$nr = 1 + max(0, $R * ($population - $infected) / $population);
-			$infected *= $nr;
-			$daily_infected[] = floor($infected - $tmp);
-			$infected_array[] = floor($tmp);
+			$infected = ceil($infected * $nr);
+			// echo $infected - $tmp . PHP_EOL;
+			$daily_infected[] = $infected - $tmp;
+			$infected_array[] = $infected;
 		});
+
+		// print_r($infected_array); 
+		// die;
 
 		// DEATHS
 		$restore_time = $this->restore_time;
-		$deaths_array = array_fill(0, $restore_time, 0);
+		$deaths_array = [];
 		$deaths = 0;
-		$daily_deaths = $deaths_array;
+		$daily_deaths = [];
 		$mortality    = $this->mortality;
-		Loop::iterate($restore_time, $this->length, function($iter) use (&$deaths_array, &$deaths, &$daily_deaths, $mortality, $infected_array, $restore_time){
-			$tmp = $infected_array[$iter - $restore_time];
-			$tmp *= $mortality;
+		Loop::iterate(0, $this->length, function($iter) use (&$deaths_array, &$deaths, &$daily_deaths, $mortality, $infected_array, $restore_time){
+			if($iter < $restore_time) $tmp = 0;
+			else $tmp = $infected_array[$iter - $restore_time] * $mortality;
 			$deaths_array[] = floor($tmp);
 			$daily_deaths[] = floor($tmp - $deaths);
 			$deaths = $tmp;
 		});
 
+		// print_r($deaths_array); 
+		// die;
+
 		// RECOVERED
-		$recovered_array = array_fill(0, $restore_time, 0);
-		Loop::iterate(0, $this->length - $restore_time, function($iter) use (&$recovered_array, $infected_array, $deaths_array){
-			$recovered_array[] = $infected_array[$iter] - $deaths_array[$iter];
+		$recovered_array = [];
+		Loop::iterate(0, $this->length, function($iter) use (&$recovered_array, $infected_array, $deaths_array, $restore_time){
+			if($iter < $restore_time) $recovered_array[] = 0;
+			else $recovered_array[] = $infected_array[$iter-$restore_time] - $deaths_array[$iter-$restore_time];
 		});
 
 		// SUSCEPTABLES
 		$susceptables_array = [];
 		$population = $this->susceptible;
-		Loop::iterate(0, $this->length, function($iter) use (&$susceptables_array, $recovered_array, $infected_array, $deaths_array, $population){
+		Loop::iterate(0, $this->length, function($iter) use (&$susceptables_array, $infected_array, $population){
 			$susceptables_array[] = $population - $infected_array[$iter];
 		});
-
-		// echo sizeof($infected_array) . " " .  sizeof($deaths_array) . " " .  sizeof($recovered_array); die;
 
 		$mainline = [];
 		Loop::iterate(0, $this->length, function($iter) use (&$mainline, $recovered_array, $infected_array, $deaths_array){
@@ -92,10 +99,10 @@ class __Cell__
 		});
 
 		$start = 0;
-		// while($mainline[$start] < 100 && ++$start < $this->length);
+		while($mainline[$start] < 10 && ++$start < $this->length);
 
 		$end = sizeof($daily_deaths)-1;
-		// while($mainline[$end] < 100 && --$end > $start+10);
+		while($mainline[$end] < 10 && --$end > $start+10);
 
 		$this->susceptables_array = array_slice($susceptables_array, $start, $end - $start);
 		$this->infected_array    = array_slice($infected_array, $start, $end - $start);
@@ -146,15 +153,16 @@ class Sir extends Activity
 			$last_result = 0;
 			$compare = Vector::extract($sir1["deaths"], function($v){ return $v*1 ? $v : null; });
 			$known_deaths = Vector::extract($known_deaths, function($v){ return $v*1 ? $v : null; });
-			$current_result = Vector::similarity($compare, $known_deaths);			
+			$current_result = Vector::similarity($compare, $known_deaths);
 			if($debug) echo "tunning... $current_result" . PHP_EOL;
 			while($current_result > $last_result && $initial_r > 1){
 				if($debug)  echo " => " . $current_result;
 				$last_result = $current_result*1;
 				$initial_r -= .01;
+				$cap -= .05;
 				if($debug)  echo " <" . $initial_r;
 				if($sir2) $sir1 = $sir2;
-				$sir2 = __Cell__::make($pop, $initial_r, $cap, $max_days_to_predict);
+				$sir2 = __Cell__::make($pop, $initial_r, max(.05, $cap), $max_days_to_predict);
 				$compare = Vector::extract($sir2["deaths"], function($v){ return $v*1 ? $v : null; });
 				$current_result = Vector::similarity($compare, $known_deaths);
 				if($debug)  echo " *" . $current_result . PHP_EOL;
